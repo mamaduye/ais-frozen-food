@@ -1,0 +1,373 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* AIS Frozen Food palette
+     - Primary: cool frozen blue
+     - Accent: deep navy
+     - Background: white
+     - Muted: light blue-gray
+     - Foreground: dark slate
+  */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.21 0.03 240);
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.21 0.03 240);
+
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.21 0.03 240);
+
+  --primary: oklch(0.62 0.13 235);
+  --primary-foreground: oklch(0.99 0 0);
+
+  --secondary: oklch(0.96 0.015 235);
+  --secondary-foreground: oklch(0.3 0.05 240);
+
+  --muted: oklch(0.97 0.01 235);
+  --muted-foreground: oklch(0.5 0.02 240);
+
+  --accent: oklch(0.32 0.07 250);
+  --accent-foreground: oklch(0.99 0 0);
+
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.99 0 0);
+
+  --border: oklch(0.92 0.01 235);
+  --input: oklch(0.92 0.01 235);
+  --ring: oklch(0.62 0.13 235);
+
+  --chart-1: oklch(0.62 0.13 235);
+  --chart-2: oklch(0.55 0.1 220);
+  --chart-3: oklch(0.32 0.07 250);
+  --chart-4: oklch(0.75 0.08 200);
+  --chart-5: oklch(0.85 0.05 230);
+
+  --radius: 0.75rem;
+
+  --sidebar: oklch(0.99 0.005 235);
+  --sidebar-foreground: oklch(0.21 0.03 240);
+  --sidebar-primary: oklch(0.62 0.13 235);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.96 0.015 235);
+  --sidebar-accent-foreground: oklch(0.32 0.07 250);
+  --sidebar-border: oklch(0.92 0.01 235);
+  --sidebar-ring: oklch(0.62 0.13 235);
+}
+
+.dark {
+  --background: oklch(0.18 0.02 240);
+  --foreground: oklch(0.97 0 0);
+  --card: oklch(0.22 0.025 240);
+  --card-foreground: oklch(0.97 0 0);
+  --popover: oklch(0.22 0.025 240);
+  --popover-foreground: oklch(0.97 0 0);
+  --primary: oklch(0.7 0.13 235);
+  --primary-foreground: oklch(0.18 0.02 240);
+  --secondary: oklch(0.28 0.03 240);
+  --secondary-foreground: oklch(0.97 0 0);
+  --muted: oklch(0.28 0.03 240);
+  --muted-foreground: oklch(0.7 0.02 240);
+  --accent: oklch(0.4 0.08 250);
+  --accent-foreground: oklch(0.97 0 0);
+  --destructive: oklch(0.5 0.2 27);
+  --destructive-foreground: oklch(0.97 0 0);
+  --border: oklch(0.3 0.03 240);
+  --input: oklch(0.3 0.03 240);
+  --ring: oklch(0.7 0.13 235);
+  --sidebar: oklch(0.22 0.025 240);
+  --sidebar-foreground: oklch(0.97 0 0);
+  --sidebar-primary: oklch(0.7 0.13 235);
+  --sidebar-primary-foreground: oklch(0.18 0.02 240);
+  --sidebar-accent: oklch(0.28 0.03 240);
+  --sidebar-accent-foreground: oklch(0.97 0 0);
+  --sidebar-border: oklch(0.3 0.03 240);
+  --sidebar-ring: oklch(0.7 0.13 235);
+}
+
+@theme inline {
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  /* Reset and base styling */
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Typography system - consistent hierarchy */
+  h1 {
+    @apply text-4xl font-semibold leading-tight tracking-tight;
+    font-family: var(--font-display);
+  }
+  h2 {
+    @apply text-3xl font-semibold leading-tight tracking-tight;
+    font-family: var(--font-display);
+  }
+  h3 {
+    @apply text-2xl font-semibold leading-snug tracking-tight;
+    font-family: var(--font-display);
+  }
+  h4 {
+    @apply text-xl font-semibold leading-snug tracking-tight;
+    font-family: var(--font-display);
+  }
+  h5 {
+    @apply text-base font-semibold leading-normal;
+    font-family: var(--font-display);
+  }
+  h6 {
+    @apply text-sm font-semibold leading-normal;
+    font-family: var(--font-display);
+  }
+
+  p {
+    @apply text-base leading-relaxed;
+  }
+  small {
+    @apply text-sm leading-relaxed;
+  }
+
+  /* Forms and inputs - consistent styling */
+  input,
+  textarea,
+  select {
+    @apply rounded-lg border border-input bg-background px-4 py-2.5 text-base leading-relaxed;
+    @apply transition-colors duration-200;
+    @apply focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-1;
+  }
+
+  input::placeholder {
+    @apply text-muted-foreground;
+  }
+
+  textarea {
+    @apply min-h-[120px] resize-none;
+  }
+
+  /* Tables - consistent styling with hover effects */
+  table {
+    @apply w-full border-collapse;
+  }
+
+  thead {
+    @apply bg-muted;
+  }
+
+  thead th {
+    @apply border-b border-border bg-muted px-4 py-3 text-left text-sm font-semibold;
+  }
+
+  tbody td {
+    @apply border-b border-border px-4 py-3 text-sm;
+  }
+
+  tbody tr {
+    @apply transition-colors duration-150;
+  }
+
+  tbody tr:hover {
+    @apply bg-muted/50;
+  }
+
+  tbody tr:nth-child(even) {
+    @apply bg-muted/30;
+  }
+
+  /* Lists - consistent spacing */
+  ul,
+  ol {
+    @apply space-y-2;
+  }
+
+  li {
+    @apply text-base leading-relaxed;
+  }
+
+  /* Links - consistent styling */
+  a {
+    @apply text-primary transition-colors duration-200 hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+  }
+
+  /* Code blocks */
+  code {
+    @apply rounded-md bg-muted px-1.5 py-0.5 font-mono text-sm;
+  }
+
+  pre {
+    @apply rounded-lg border border-border bg-muted p-4 overflow-x-auto;
+  }
+}
+
+@layer components {
+  /* Button system - unified styling */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-2.5 font-semibold text-primary-foreground;
+    @apply transition-all duration-200 hover:bg-primary/90 hover:shadow-md;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-secondary px-6 py-2.5 font-semibold text-secondary-foreground;
+    @apply transition-all duration-200 hover:bg-secondary/80 hover:shadow-sm;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-6 py-2.5 font-semibold text-foreground;
+    @apply transition-all duration-200 hover:bg-muted;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-destructive {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-destructive px-6 py-2.5 font-semibold text-destructive-foreground;
+    @apply transition-all duration-200 hover:bg-destructive/90 hover:shadow-md;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-destructive;
+  }
+
+  .btn-sm {
+    @apply px-4 py-1.5 text-sm;
+  }
+
+  .btn-lg {
+    @apply px-8 py-3 text-lg;
+  }
+
+  /* Card system - unified styling */
+  .card-base {
+    @apply rounded-lg border border-border bg-card text-card-foreground;
+    @apply transition-all duration-200;
+  }
+
+  .card-interactive {
+    @apply rounded-lg border border-border bg-card text-card-foreground;
+    @apply transition-all duration-200 hover:shadow-md hover:border-primary/30;
+  }
+
+  /* Section spacing - consistent layout rhythm */
+  .section-padding {
+    @apply px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16;
+  }
+
+  .section-spacing {
+    @apply space-y-8;
+  }
+
+  /* Container sizing */
+  .container-max {
+    @apply mx-auto max-w-7xl;
+  }
+
+  /* Grid and flex spacing */
+  .grid-spacing {
+    @apply gap-6 sm:gap-8;
+  }
+
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+
+  .flex-between {
+    @apply flex items-center justify-between;
+  }
+
+  /* Loading state utilities */
+  .animate-pulse-soft {
+    @apply animate-pulse;
+  }
+
+  .skeleton {
+    @apply rounded-lg bg-muted animate-pulse;
+  }
+
+  /* Empty state styling */
+  .empty-state {
+    @apply flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-border py-12 text-center;
+  }
+
+  .empty-state-icon {
+    @apply h-16 w-16 text-muted-foreground mb-4;
+  }
+
+  .empty-state-title {
+    @apply text-xl font-semibold text-foreground mb-2;
+  }
+
+  .empty-state-description {
+    @apply text-muted-foreground mb-6;
+  }
+
+  /* Mobile-friendly utilities */
+  .touch-target {
+    @apply min-h-10 min-w-10;
+  }
+
+  .input-mobile {
+    @apply h-12 text-base;
+  }
+
+  .button-mobile {
+    @apply min-h-12 px-4 py-3 text-base;
+  }
+
+  /* Responsive spacing for mobile */
+  .section-padding-mobile {
+    @apply px-3 py-6 sm:px-4 sm:py-8 md:px-6 md:py-10 lg:px-8 lg:py-12;
+  }
+
+  /* Table scroll container for mobile */
+  .table-scroll {
+    @apply overflow-x-auto -mx-3 sm:-mx-4 md:-mx-0;
+  }
+
+  .table-scroll table {
+    @apply min-w-full;
+  }
+}
