@@ -289,78 +289,145 @@ WHATSAPP_BUSINESS_API_KEY=
 
 ```
 ├── app/
-│   ├── layout.tsx                 # Root layout (fonts, providers, metadata)
-│   ├── globals.css                # Design tokens & Tailwind config
-│   ├── (shop)/                    # Customer-facing routes
-│   │   ├── layout.tsx             # Shop layout (header, footer, cart provider)
-│   │   ├── page.tsx               # Home page (hero, categories, featured products)
-│   │   ├── products/
-│   │   │   ├── page.tsx           # Products listing (with filters, search, pagination)
-│   │   │   ├── products-client.tsx # Client-side filter logic
-│   │   │   └── [slug]/
-│   │   │       ├── page.tsx       # Product detail page
-│   │   │       ├── product-detail-client.tsx # Add-to-cart, image gallery
-│   │   │       └── product-reviews.tsx # Reviews display
-│   │   ├── cart/
-│   │   │   ├── page.tsx           # Cart page
-│   │   │   └── cart-client.tsx    # Cart management (add/remove/quantity)
-│   │   ├── checkout/
-│   │   │   ├── page.tsx           # Checkout page
-│   │   │   └── checkout-client.tsx # Form (address, payment method)
-│   │   └── orders/
-│   │       ├── page.tsx           # Customer orders history
-│   │       └── orders-client.tsx  # Order list & tracking
-│   ├── (auth)/                    # Authentication routes
-│   │   ├── layout.tsx             # Auth layout
+│   ├── globals.css
+│   ├── layout.tsx
+│   ├── (auth)/
+│   │   ├── layout.tsx
 │   │   ├── login/
-│   │   │   ├── page.tsx
-│   │   │   └── login-form.tsx
+│   │   │   ├── login-form.tsx
+│   │   │   └── page.tsx
 │   │   └── register/
 │   │       ├── page.tsx
 │   │       └── register-form.tsx
-│   └── admin/                     # Admin dashboard routes
-│       ├── layout.tsx             # Admin layout with sidebar
-│       ├── page.tsx               # Dashboard overview (KPIs, charts)
-│       ├── products/
-│       │   ├── page.tsx
-│       │   └── admin-products-client.tsx # Add/edit/delete products
-│       ├── orders/
-│       │   ├── page.tsx           # Orders list with filters
-│       │   ├── admin-orders-client.tsx
-│       │   └── [id]/
-│       │       ├── page.tsx
-│       │       └── admin-order-detail-client.tsx # View/update order status
-│       ├── users/
-│       │   ├── page.tsx           # User list
-│       │   └── [id]/page.tsx      # User detail + order history
-│       ├── reviews/
-│       │   ├── page.tsx
-│       │   └── admin-reviews-client.tsx # Approve/hide reviews
-│       └── reports/
-│           └── page.tsx           # Sales reports & analytics
-├── components/
-│   ├── ui/                        # shadcn/ui components (56 files)
-│   ├── site-header.tsx            # Navigation bar with logo, search, cart icon
-│   ├── site-footer.tsx            # Footer with links & info
-│   ├── cart-provider.tsx          # Cart context provider (useCart hook)
-│   ├── product-card.tsx           # Product card component (reusable)
-│   ├── whatsapp-button.tsx        # WhatsApp floating button
-│   ├── order-status-badge.tsx     # Status badge component
+│   ├── (shop)/
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   ├── cart/
+│   │   │   ├── cart-client.tsx
+│   │   │   └── page.tsx
+│   │   ├── checkout/
+│   │   │   ├── checkout-client.tsx
+│   │   │   └── page.tsx
+│   │   ├── orders/
+│   │   │   ├── orders-client.tsx
+│   │   │   └── page.tsx
+│   │   └── products/
+│   │       ├── page.tsx
+│   │       ├── products-client.tsx
+│   │       └── [slug]/
 │   └── admin/
-│       ├── admin-shell.tsx        # Admin sidebar navigation
-│       ├── admin-sales-chart.tsx  # Revenue chart component
-│       └── admin-order-detail-client.tsx
+│       ├── layout.tsx
+│       ├── page.tsx
+│       ├── orders/
+│       │   └── ...
+│       ├── products/
+│       │   └── ...
+│       ├── reports/
+│       │   └── page.tsx
+│       ├── reviews/
+│       │   └── ...
+│       └── users/
+│           └── ...
+├── components/
+│   ├── cart-provider.tsx
+│   ├── loading-spinner.tsx
+│   ├── order-status-badge.tsx
+│   ├── product-card.tsx
+│   ├── site-footer.tsx
+│   ├── site-header.tsx
+│   ├── theme-provider.tsx
+│   ├── whatsapp-button.tsx
+│   ├── admin/
+│   │   ├── admin-sales-chart.tsx
+│   │   └── admin-shell.tsx
+│   └── ui/
+│       ├── accordion.tsx
+│       ├── alert-dialog.tsx
+│       ├── alert.tsx
+│       ├── aspect-ratio.tsx
+│       ├── avatar.tsx
+│       ├── badge.tsx
+│       ├── breadcrumb.tsx
+│       ├── button.tsx
+│       ├── calendar.tsx
+│       ├── card.tsx
+│       ├── carousel.tsx
+│       ├── chart.tsx
+│       ├── checkbox.tsx
+│       ├── collapsible.tsx
+│       ├── command.tsx
+│       ├── context-menu.tsx
+│       ├── dialog.tsx
+│       ├── drawer.tsx
+│       ├── dropdown-menu.tsx
+│       ├── empty.tsx
+│       ├── field.tsx
+│       ├── form.tsx
+│       ├── hover-card.tsx
+│       ├── input-otp.tsx
+│       ├── input.tsx
+│       ├── item.tsx
+│       ├── kbd.tsx
+│       ├── label.tsx
+│       ├── menubar.tsx
+│       ├── navigation-menu.tsx
+│       ├── pagination.tsx
+│       ├── popover.tsx
+│       ├── progress.tsx
+│       ├── radio-group.tsx
+│       ├── resizable.tsx
+│       ├── scroll-area.tsx
+│       ├── select.tsx
+│       ├── separator.tsx
+│       ├── sheet.tsx
+│       ├── sidebar.tsx
+│       ├── skeleton.tsx
+│       ├── slider.tsx
+│       ├── sonner.tsx
+│       ├── spinner.tsx
+│       ├── switch.tsx
+│       ├── table.tsx
+│       ├── tabs.tsx
+│       ├── textarea.tsx
+│       ├── toast.tsx
+│       ├── toaster.tsx
+│       ├── toggle-group.tsx
+│       ├── toggle.tsx
+│       ├── tooltip.tsx
+│       ├── use-mobile.tsx
+│       └── use-toast.ts
+├── hooks/
+│   ├── use-mobile.ts
+│   └── use-toast.ts
 ├── lib/
-│   ├── types.ts                   # TypeScript interfaces (Category, Product, User, Order, Review, etc.)
-│   ├── data.ts                    # Mock data (products, orders, users, reviews)
-│   └── utils.ts                   # Utility functions (cn for class merging)
+│   ├── data.ts
+│   ├── types.ts
+│   └── utils.ts
 ├── public/
-│   ├── hero-frozen-food.jpg       # Generated hero image
-│   └── [other assets]
-├── package.json                   # Dependencies & scripts
-├── tsconfig.json                  # TypeScript config
-├── next.config.mjs                # Next.js config
-└── tailwind.config.ts             # Tailwind config (not used in v4, use globals.css instead)
+├── styles/
+│   └── globals.css
+├── BACKEND_SETUP.md
+├── CODEBASE_CLEANUP_SUMMARY.md
+├── components.json
+├── DATA_SCHEMA_REFACTOR.md
+├── DESIGN_REFINEMENT_SUMMARY.md
+├── DESIGN_SYSTEM.md
+├── DOCS_INDEX.md
+├── MOBILE_AUDIT_SUMMARY.md
+├── MOBILE_RESPONSIVENESS.md
+├── next-env.d.ts
+├── next.config.mjs
+├── package.json
+├── pnpm-lock.yaml
+├── postcss.config.mjs
+├── PROGRESS.md
+├── QUICK_REFERENCE.md
+├── README.md
+├── REFINEMENT_CHECKLIST.md
+├── SCHEMA_REFACTOR_SUMMARY.md
+├── START_HERE.md
+├── TROUBLESHOOTING.md
+└── tsconfig.json
 ```
 
 ---

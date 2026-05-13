@@ -4,11 +4,12 @@ import { ArrowRight, Snowflake, ShieldCheck, Truck, Star, Quote } from "lucide-r
 import { Button } from "@/components/ui/button"
 import { ProductCard } from "@/components/product-card"
 import { categories, products, reviews } from "@/lib/data"
+import { supabase } from "@/lib/supabase/client"
 
 export default function HomePage() {
   const featured = products.filter((p) => p.featured)
   const testimonials = reviews.filter((r) => r.rating >= 5).slice(0, 3)
-
+ 
   return (
     <>
       {/* Hero */}
