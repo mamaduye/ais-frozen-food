@@ -1,7 +1,12 @@
 import { CheckoutClient } from "./checkout-client"
 
-export const metadata = {
-  title: "Checkout — AIS Frozen Food",
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Checkout",
+
+  description:
+    "Selesaikan pesanan frozen food Anda dengan aman dan mudah.",
 }
 
 export default function CheckoutPage() {

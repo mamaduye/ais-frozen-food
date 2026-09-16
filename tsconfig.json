@@ -6,7 +6,7 @@
       "esnext"
     ],
     "allowJs": true,
-    "target": "ES6",
+    "target": "es2017",
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
@@ -34,7 +34,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
-  ],
+, "proxy.ts", "node_modules/middleware.ts", "middleware.ts.bak"  ],
   "exclude": [
     "node_modules"
   ]

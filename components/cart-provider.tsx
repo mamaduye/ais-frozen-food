@@ -1,7 +1,15 @@
 "use client"
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react"
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react"
+
 import type { CartItem, Product } from "@/lib/types"
+import { supabase } from "@/lib/supabase/client"
 
 type CartContextValue = {
   items: CartItem[]
@@ -15,49 +23,133 @@ type CartContextValue = {
 
 const CartContext = createContext<CartContextValue | undefined>(undefined)
 
-const STORAGE_KEY = "ais-cart"
-
-export function CartProvider({ children }: { children: React.ReactNode }) {
+export function CartProvider({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   const [items, setItems] = useState<CartItem[]>([])
   const [hydrated, setHydrated] = useState(false)
+  const [userId, setUserId] = useState<string | null>(null)
 
+  /*
+   * 1. Ambil user saat pertama kali aplikasi berjalan
+   * 2. Dengarkan perubahan login/logout Supabase
+   */
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY)
-      if (raw) setItems(JSON.parse(raw))
-    } catch (err) {
-      console.log("[v0] cart hydrate error:", err)
+    async function loadUser() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      setUserId(user?.id ?? null)
     }
-    setHydrated(true)
+
+    loadUser()
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUserId(session?.user?.id ?? null)
+      }
+    )
+
+    return () => {
+      subscription.unsubscribe()
+    }
   }, [])
 
+  /*
+   * Load cart berdasarkan user
+   */
   useEffect(() => {
-    if (!hydrated) return
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
-    } catch (err) {
-      console.log("[v0] cart persist error:", err)
+    // Belum tahu user siapa
+    if (userId === undefined) return
+
+    // User logout
+    if (!userId) {
+      setItems([])
+      setHydrated(true)
+      return
     }
-  }, [items, hydrated])
+
+    const storageKey = `ais-cart-${userId}`
+
+    try {
+      const raw = localStorage.getItem(storageKey)
+
+      if (raw) {
+        setItems(JSON.parse(raw))
+      } else {
+        setItems([])
+      }
+    } catch (error) {
+      console.error("[cart] hydrate error:", error)
+      setItems([])
+    }
+
+    setHydrated(true)
+  }, [userId])
+
+  /*
+   * Simpan cart hanya ke cart milik user aktif
+   */
+  useEffect(() => {
+    if (!hydrated || !userId) return
+
+    const storageKey = `ais-cart-${userId}`
+
+    try {
+      localStorage.setItem(
+        storageKey,
+        JSON.stringify(items)
+      )
+    } catch (error) {
+      console.error("[cart] persist error:", error)
+    }
+  }, [items, hydrated, userId])
 
   const value = useMemo<CartContextValue>(() => {
-    const itemCount = items.reduce((acc, i) => acc + i.quantity, 0)
-    const subtotal = items.reduce((acc, i) => acc + i.price * i.quantity, 0)
+    const itemCount = items.reduce(
+      (acc, item) => acc + item.quantity,
+      0
+    )
+
+    const subtotal = items.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0
+    )
 
     return {
       items,
+
       itemCount,
+
       subtotal,
-      addItem: (product, quantity = 1) => {
+
+      addItem: (
+        product,
+        quantity = 1
+      ) => {
         setItems((prev) => {
-          const existing = prev.find((i) => i.productId === product.id)
+          const existing = prev.find(
+            (item) =>
+              item.productId === product.id
+          )
+
           if (existing) {
-            return prev.map((i) =>
-              i.productId === product.id
-                ? { ...i, quantity: i.quantity + quantity }
-                : i,
+            return prev.map((item) =>
+              item.productId === product.id
+                ? {
+                    ...item,
+                    quantity:
+                      item.quantity + quantity,
+                  }
+                : item
             )
           }
+
           return [
             ...prev,
             {
@@ -71,25 +163,58 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           ]
         })
       },
+
       removeItem: (productId) => {
-        setItems((prev) => prev.filter((i) => i.productId !== productId))
-      },
-      updateQuantity: (productId, quantity) => {
         setItems((prev) =>
-          prev
-            .map((i) => (i.productId === productId ? { ...i, quantity } : i))
-            .filter((i) => i.quantity > 0),
+          prev.filter(
+            (item) =>
+              item.productId !== productId
+          )
         )
       },
-      clearCart: () => setItems([]),
+
+      updateQuantity: (
+        productId,
+        quantity
+      ) => {
+        setItems((prev) =>
+          prev
+            .map((item) =>
+              item.productId === productId
+                ? {
+                    ...item,
+                    quantity,
+                  }
+                : item
+            )
+            .filter(
+              (item) =>
+                item.quantity > 0
+            )
+        )
+      },
+
+      clearCart: () => {
+        setItems([])
+      },
     }
   }, [items])
 
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>
+  return (
+    <CartContext.Provider value={value}>
+      {children}
+    </CartContext.Provider>
+  )
 }
 
 export function useCart() {
-  const ctx = useContext(CartContext)
-  if (!ctx) throw new Error("useCart must be used within CartProvider")
-  return ctx
+  const context = useContext(CartContext)
+
+  if (!context) {
+    throw new Error(
+      "useCart must be used within CartProvider"
+    )
+  }
+
+  return context
 }

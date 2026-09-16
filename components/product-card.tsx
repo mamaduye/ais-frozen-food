@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useCart } from "@/components/cart-provider"
-import { formatRupiah, getCategoryName } from "@/lib/data"
+import { formatRupiah } from "@/lib/data"
 import type { Product } from "@/lib/types"
 import { toast } from "sonner"
 
@@ -22,6 +22,7 @@ export function ProductCard({ product }: { product: Product }) {
           src={product.images[0] || "/placeholder.svg"}
           alt={product.name}
           fill
+          loading="lazy"
           sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
@@ -34,7 +35,7 @@ export function ProductCard({ product }: { product: Product }) {
       <div className="flex flex-1 flex-col gap-3 p-4">
         <div>
           <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
-            {getCategoryName(product.categoryId)}
+            {product.category}
           </p>
           <Link href={`/products/${product.slug}`}>
             <h3 className="mt-1 line-clamp-1 font-display text-base font-semibold text-foreground group-hover:text-primary">

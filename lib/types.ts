@@ -5,14 +5,15 @@
 export enum OrderStatus {
   PENDING = "pending",
   PAID = "paid",
-  PROCESSING = "processing",
+  PROCESSED = "processed",
   SHIPPED = "shipped",
-  DELIVERED = "delivered",
+  COMPLETED = "completed",
   CANCELLED = "cancelled",
 }
 
 export enum PaymentStatus {
   PENDING = "pending",
+  WAITING_VERIFICATION = "waiting_verification",
   COMPLETED = "completed",
   FAILED = "failed",
   REFUNDED = "refunded",
@@ -21,6 +22,7 @@ export enum PaymentStatus {
 export enum UserRole {
   CUSTOMER = "customer",
   ADMIN = "admin",
+  SUPER_ADMIN = "super_admin",
 }
 
 export enum ProductStatus {
@@ -49,6 +51,8 @@ export type Product = {
   slug: string
   price: number
   categoryId: string
+  categorySlug: string
+  category: string
   shortDescription: string
   description: string
   images: string[]
@@ -66,6 +70,7 @@ export type Product = {
 }
 
 export type User = {
+  joinedAt: string | number | Date
   id: string
   name: string
   email: string
@@ -89,8 +94,9 @@ export type Review = {
   userInitials: string
   rating: number
   comment: string
-  orderId?: string
+  orderId: string
   verified: boolean
+  isHidden: boolean
   createdAt: string
   updatedAt: string
 }
@@ -141,4 +147,39 @@ export type CartItem = {
   image: string
   quantity: number
   weight: string
+}
+
+// ============================================================================
+// Admin-Side Order Details - For Admin Order Management
+// ============================================================================
+export interface AdminOrder {
+  id: string
+  orderNumber: string
+
+  customerName: string
+  customerEmail: string
+  customerPhone: string
+
+  status: OrderStatus
+  paymentStatus: PaymentStatus
+
+  paymentMethod: "transfer" | "cod"
+
+  paymentProof: string | null
+
+  subtotal: number
+  shipping: number
+  total: number
+
+  address: string
+
+  paidAt: string | null
+  date: string
+
+  items: {
+    productId: string
+    name: string
+    quantity: number
+    price: number
+  }[]
 }

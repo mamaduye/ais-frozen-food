@@ -1,6 +1,10 @@
-import { orders } from "@/lib/data"
 import { AdminOrdersClient } from "./admin-orders-client"
+import { getAdminOrders } from "@/lib/supabase/admin-orders"
 
-export default function AdminOrdersPage() {
-  return <AdminOrdersClient initialOrders={orders} />
+export default async function AdminOrdersPage() {
+  const orders = await getAdminOrders()
+
+  return (
+    <AdminOrdersClient initialOrders={orders} />
+  )
 }

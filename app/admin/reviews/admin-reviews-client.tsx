@@ -7,45 +7,69 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import type { Review } from "@/lib/types"
+import {
+  toggleReviewVisibility,
+  deleteReview,
+} from "./action"
 
 type EnrichedReview = Review & { productName: string }
 
 export function AdminReviewsClient({ initialReviews }: { initialReviews: EnrichedReview[] }) {
-  const [items, setItems] = useState(
-    initialReviews.map((r) => ({ ...r, hidden: false })),
-  )
+  const [items, setItems] = useState(initialReviews)
 
-  function toggleHide(id: string) {
-    setItems((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, hidden: !r.hidden } : r)),
-    )
+  async function toggleHide(id: string, currentHidden: boolean) {
+    try {
+      const nextHidden = !currentHidden
+
+      await toggleReviewVisibility(id, nextHidden)
+
+      setItems((prev) =>
+        prev.map((r) =>
+          r.id === id
+            ? { ...r, isHidden: nextHidden }
+            : r
+        )
+      )
+    } catch (error) {
+      console.error(error)
+      alert("Gagal mengubah status review")
+    }
   }
 
-  function remove(id: string) {
-    if (confirm("Delete this review? This cannot be undone.")) {
+  async function remove(id: string) {
+    if (!confirm("Delete this review? This cannot be undone.")) {
+      return
+    }
+
+    try {
+      await deleteReview(id)
+
       setItems((prev) => prev.filter((r) => r.id !== id))
+    } catch (error) {
+      console.error(error)
+      alert("Gagal menghapus review")
     }
   }
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-serif text-3xl">Reviews</h1>
+        <h1 className="font-Display text-3xl">Ulasan</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Reviews from customers with completed orders. Hide or delete inappropriate content.
+          Ulasan pelanggan yang dikirimkan melalui toko. Anda dapat menyembunyikan atau menghapus ulasan dari sini.
         </p>
       </div>
 
       {items.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center text-muted-foreground">
-            No reviews yet.
+            Tidak ada ulasan.
           </CardContent>
         </Card>
       ) : (
         <div className="grid gap-4">
           {items.map((r) => (
-            <Card key={r.id} className={r.hidden ? "opacity-60" : ""}>
+            <Card key={r.id} className={r.isHidden ? "opacity-60" : ""}>
               <CardContent className="p-5">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex gap-3">
@@ -60,7 +84,7 @@ export function AdminReviewsClient({ initialReviews }: { initialReviews: Enriche
                         <Badge variant="secondary" className="text-xs">
                           {r.productName}
                         </Badge>
-                        {r.hidden ? (
+                        {r.isHidden ? (
                           <Badge variant="outline" className="text-xs text-muted-foreground">
                             Hidden
                           </Badge>
@@ -80,7 +104,7 @@ export function AdminReviewsClient({ initialReviews }: { initialReviews: Enriche
                           ))}
                         </div>
                         <span className="text-xs text-muted-foreground">
-                          {new Date(r.date).toLocaleDateString("id-ID", {
+                          {new Date(r.createdAt).toLocaleDateString("id-ID", {
                             day: "numeric",
                             month: "short",
                             year: "numeric",
@@ -93,14 +117,14 @@ export function AdminReviewsClient({ initialReviews }: { initialReviews: Enriche
                     </div>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
-                    <Button variant="outline" size="sm" onClick={() => toggleHide(r.id)}>
-                      {r.hidden ? (
+                    <Button variant="outline" size="sm" onClick={() => toggleHide(r.id, r.isHidden)}>
+                      {r.isHidden ? (
                         <>
-                          <Eye className="mr-1.5 h-4 w-4" /> Show
+                          <Eye className="mr-1.5 h-4 w-4" /> Perlihatkan
                         </>
                       ) : (
                         <>
-                          <EyeOff className="mr-1.5 h-4 w-4" /> Hide
+                          <EyeOff className="mr-1.5 h-4 w-4" /> Sembunyikan
                         </>
                       )}
                     </Button>
@@ -108,9 +132,16 @@ export function AdminReviewsClient({ initialReviews }: { initialReviews: Enriche
                       variant="outline"
                       size="sm"
                       onClick={() => remove(r.id)}
-                      className="text-destructive hover:text-destructive"
+                      className="
+                          text-destructive
+                          hover:bg-destructive
+                        hover:text-white
+                          hover:scale-105
+                          transition-all
+                          duration-200
+                        "
                     >
-                      <Trash2 className="mr-1.5 h-4 w-4" /> Delete
+                      <Trash2 className="mr-1.5 h-4 w-4" /> Hapus
                     </Button>
                   </div>
                 </div>

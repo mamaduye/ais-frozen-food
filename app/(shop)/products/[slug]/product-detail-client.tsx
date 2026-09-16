@@ -48,7 +48,12 @@ export function ProductDetailClient({ product }: { product: Product }) {
                 )}
                 aria-label={`View image ${i + 1}`}
               >
-                <Image src={src || "/placeholder.svg"} alt="" fill sizes="80px" className="object-cover" />
+                <Image 
+                src={src || "/placeholder.svg"} 
+                alt="" 
+                fill sizes="80px" 
+                className="object-cover" 
+                />
               </button>
             ))}
           </div>
@@ -113,15 +118,15 @@ export function ProductDetailClient({ product }: { product: Product }) {
 
           <Button
             size="lg"
-            className="flex-1"
+            className="h-12 flex-1 gap-2 text-sm font-semibold sm:h-11 button-mobile justify-center sm:button-auto rounded-full"
             disabled={product.stock === 0}
             onClick={() => {
               addItem(product, quantity)
               toast.success(`${quantity} × ${product.name} added to cart`)
             }}
           >
-            <ShoppingCart className="h-4 w-4" />
-            Add to cart · {formatRupiah(product.price * quantity)}
+            <ShoppingCart className="h-5 w-5" />
+            Tambahkan
           </Button>
         </div>
       </div>

@@ -2,7 +2,15 @@
 
 import Link from "next/link"
 import { useState } from "react"
-import { ArrowLeft, MapPin, Phone, Mail, CreditCard } from "lucide-react"
+import {
+  ArrowLeft,
+  MapPin,
+  Phone,
+  Mail,
+  CreditCard,
+  Calendar,
+  Image as ImageIcon,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
@@ -15,32 +23,106 @@ import {
 } from "@/components/ui/select"
 import { OrderStatusBadge } from "@/components/order-status-badge"
 import { formatRupiah } from "@/lib/data"
-import type { Order, OrderStatus } from "@/lib/types"
+import {
+  AdminOrder,
+  OrderStatus,
+  PaymentStatus,
+} from "@/lib/types"
+import { updateOrderStatusAction, verifyPaymentAction } from "./action"
+import { useRouter } from "next/navigation"
 
-const STATUS_OPTIONS: { value: OrderStatus; label: string }[] = [
-  { value: "pending", label: "Pending" },
-  { value: "paid", label: "Paid" },
-  { value: "processed", label: "Processed" },
-  { value: "shipped", label: "Shipped" },
-  { value: "completed", label: "Completed" },
-  { value: "cancelled", label: "Cancelled" },
+
+const STATUS_OPTIONS = [
+  {
+    value: OrderStatus.PENDING,
+    label: "Pending",
+  },
+  {
+    value: OrderStatus.PAID,
+    label: "Paid",
+  },
+  {
+    value: OrderStatus.PROCESSED,
+    label: "Processed",
+  },
+  {
+    value: OrderStatus.SHIPPED,
+    label: "Shipped",
+  },
+  {
+    value: OrderStatus.COMPLETED,
+    label: "Completed",
+  },
+  {
+    value: OrderStatus.CANCELLED,
+    label: "Cancelled",
+  },
 ]
 
-export function AdminOrderDetailClient({ initialOrder }: { initialOrder: Order }) {
-  const [order, setOrder] = useState<Order>(initialOrder)
+export function AdminOrderDetailClient({ initialOrder }: { initialOrder: AdminOrder }) {
+
+  const router = useRouter()
+  const [order, setOrder] = useState<AdminOrder>(initialOrder)
   const [pendingStatus, setPendingStatus] = useState<OrderStatus>(initialOrder.status)
 
-  function handleSave() {
-    setOrder({ ...order, status: pendingStatus })
+  async function handleSave() {
+    await updateOrderStatusAction(
+      order.id,
+      pendingStatus
+    )
+
+    setOrder({
+      ...order,
+      status: pendingStatus,
+    })
+
+    router.refresh()
   }
 
-  function handleCancel() {
-    if (!confirm("Cancel this order? This action cannot be undone.")) return
-    setOrder({ ...order, status: "cancelled" })
-    setPendingStatus("cancelled")
+  async function handleCancel() {
+    if (!confirm("batalkan pesanan?")) return
+
+    await updateOrderStatusAction(
+      order.id,
+      OrderStatus.CANCELLED
+    )
+
+    setOrder({
+      ...order,
+      status: OrderStatus.CANCELLED,
+    })
+
+    setPendingStatus(OrderStatus.CANCELLED)
+
+    router.refresh()
   }
 
-  const canCancel = order.status === "pending" || order.status === "paid"
+  const canCancel = order.status === OrderStatus.PENDING || order.status === OrderStatus.PAID
+
+  async function handleVerifyPayment() {
+    if (!confirm("Verifikasi pembayaran ini?")) return
+
+    try {
+      await verifyPaymentAction(order.id)
+
+      setOrder({
+        ...order,
+        status: OrderStatus.PAID,
+        paymentStatus: PaymentStatus.COMPLETED,
+        paidAt: new Date().toISOString(),
+      })
+
+      setPendingStatus(OrderStatus.PAID)
+
+      router.refresh()
+    } catch (error) {
+      console.error("VERIFY PAYMENT ERROR:", error)
+      alert("Gagal memverifikasi pembayaran.")
+    }
+  }
+
+  console.log("PAYMENT PROOF:", order.paymentProof)
+  console.log("PAYMENT STATUS:", order.paymentStatus)
 
   return (
     <div className="space-y-6">
@@ -48,15 +130,15 @@ export function AdminOrderDetailClient({ initialOrder }: { initialOrder: Order }
         <div>
           <Button asChild variant="ghost" size="sm" className="mb-2 -ml-2">
             <Link href="/admin/orders">
-              <ArrowLeft className="mr-1 h-4 w-4" /> Back to orders
+              <ArrowLeft className="mr-1 h-4 w-4" /> Kembali ke Pesanan
             </Link>
           </Button>
           <div className="flex items-center gap-3">
-            <h1 className="font-serif text-3xl">{order.id}</h1>
+            <h1 className="font-serif text-3xl">{order.orderNumber}</h1>
             <OrderStatusBadge status={order.status} />
           </div>
           <p className="mt-1 text-sm text-muted-foreground">
-            Placed on{" "}
+            Dibuat pada{" "}
             {new Date(order.date).toLocaleDateString("id-ID", {
               day: "numeric",
               month: "long",
@@ -70,7 +152,7 @@ export function AdminOrderDetailClient({ initialOrder }: { initialOrder: Order }
         <div className="space-y-6 lg:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle className="font-serif">Items ordered</CardTitle>
+              <CardTitle className="font-serif">Barang yang dipesan</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {order.items.map((item) => (
@@ -94,7 +176,7 @@ export function AdminOrderDetailClient({ initialOrder }: { initialOrder: Order }
                   <span>{formatRupiah(order.subtotal)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Shipping</span>
+                  <span className="text-muted-foreground">Ongkos Kirim</span>
                   <span>{formatRupiah(order.shipping)}</span>
                 </div>
                 <div className="flex justify-between border-t pt-2 text-base font-semibold">
@@ -107,43 +189,135 @@ export function AdminOrderDetailClient({ initialOrder }: { initialOrder: Order }
 
           <Card>
             <CardHeader>
-              <CardTitle className="font-serif">Customer</CardTitle>
+              <CardTitle className="font-serif">Pelanggan</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-3 sm:grid-cols-2">
               <div className="text-sm">
                 <div className="font-medium">{order.customerName}</div>
-                <div className="mt-2 flex items-center gap-2 text-muted-foreground">
-                  <Mail className="h-4 w-4" />
-                  {order.customerEmail}
-                </div>
-                <div className="mt-1 flex items-center gap-2 text-muted-foreground">
-                  <Phone className="h-4 w-4" />
-                  {order.customerPhone}
-                </div>
+                {order.customerEmail && (
+                  <div className="mt-2 flex items-center gap-2 text-muted-foreground">
+                      <Mail className="h-4 w-4" />
+                      {order.customerEmail}
+                  </div>
+                )}
+                {order.customerPhone && (
+                  <div className="mt-1 flex items-center gap-2 text-muted-foreground">
+                    <Phone className="h-4 w-4" />
+                    {order.customerPhone}
+                  </div>
+                )}
               </div>
+    
               <div className="text-sm">
                 <div className="flex items-start gap-2 text-muted-foreground">
                   <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
                   <span>{order.address}</span>
                 </div>
-                <div className="mt-2 flex items-center gap-2 text-muted-foreground">
-                  <CreditCard className="h-4 w-4" />
-                  <span className="capitalize">
-                    {order.paymentMethod === "transfer" ? "Bank transfer" : "Cash on delivery"}
-                  </span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-serif">
+                Informasi Pembayaran
+              </CardTitle>
+            </CardHeader>
+
+            <CardContent className="space-y-4">
+
+              <div>
+                <p className="text-sm text-muted-foreground">
+                  Status Pembayaran
+                </p>
+
+                <p className="font-medium capitalize">
+                  {order.paymentStatus}
+                </p>
+              </div>
+
+              <Separator />
+
+              <div>
+                <p className="text-sm text-muted-foreground">
+                  Metode Pembayaran
+                </p>
+
+                <p className="font-medium capitalize">
+                  {order.paymentMethod === "transfer"
+                    ? "Bank Transfer"
+                    : "Cash on Delivery"}
+                </p>
+              </div>
+
+              <Separator />
+
+              <div className="flex items-start gap-2">
+                <Calendar className="h-4 w-4 mt-1 text-muted-foreground" />
+
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    Dibayar pada
+                  </p>
+
+                  <p>
+                    {order.paidAt
+                      ? new Date(order.paidAt).toLocaleString("id-ID")
+                      : "-"}
+                  </p>
                 </div>
               </div>
+
+              <Separator />
+
+              <div className="flex items-start gap-2">
+                <ImageIcon className="h-4 w-4 mt-1 text-muted-foreground" />
+
+                <div className="w-full">
+                  <p className="text-sm text-muted-foreground">
+                    Bukti Pembayaran
+                  </p>
+
+                  {order.paymentProof ? (
+                    <div className="space-y-3">
+                      <a
+                        href={order.paymentProof}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="block text-primary underline"
+                      >
+                        Lihat bukti pembayaran
+                      </a>
+
+                      {order.paymentStatus === PaymentStatus.WAITING_VERIFICATION && (
+                        <Button
+                          onClick={handleVerifyPayment}
+                          size="sm"
+                          className="w-fit"
+                        >
+                          Verifikasi Pembayaran
+                        </Button>
+                      )}
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground">
+                        Tidak ada bukti pembayaran.
+                      </p>
+                  )}
+                </div>
+              </div>
+
             </CardContent>
           </Card>
         </div>
 
         <Card className="h-fit">
           <CardHeader>
-            <CardTitle className="font-serif">Update status</CardTitle>
+            <CardTitle className="font-serif">Perbarui Status</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="text-sm font-medium">Order status</label>
+              <label className="text-sm font-medium">Status Pesanan</label>
               <Select
                 value={pendingStatus}
                 onValueChange={(v) => setPendingStatus(v as OrderStatus)}
@@ -160,7 +334,7 @@ export function AdminOrderDetailClient({ initialOrder }: { initialOrder: Order }
                 </SelectContent>
               </Select>
               <p className="mt-1.5 text-xs text-muted-foreground">
-                Customers can see status changes immediately.
+                Pelanggan dapat melihat perubahan status secara langsung.
               </p>
             </div>
             <Button
@@ -168,20 +342,20 @@ export function AdminOrderDetailClient({ initialOrder }: { initialOrder: Order }
               onClick={handleSave}
               disabled={pendingStatus === order.status}
             >
-              Save status
+              Simpan
             </Button>
             <Separator />
             <div>
               <Button
-                variant="outline"
-                className="w-full text-destructive hover:text-destructive"
+                variant="destructive"
+                className="w-full text-white"
                 onClick={handleCancel}
                 disabled={!canCancel}
               >
-                Cancel order
+                Batalkan Pesanan
               </Button>
               <p className="mt-1.5 text-xs text-muted-foreground">
-                Orders can only be cancelled while pending or paid.
+                Pesanan hanya bisa dibatalkan saat dalam status pending atau paid.
               </p>
             </div>
           </CardContent>

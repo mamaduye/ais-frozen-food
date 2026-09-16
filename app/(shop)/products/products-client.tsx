@@ -5,13 +5,24 @@ import { useSearchParams } from "next/navigation"
 import { Search, SlidersHorizontal } from "lucide-react"
 import { ProductCard } from "@/components/product-card"
 import { Input } from "@/components/ui/input"
-import { categories, products } from "@/lib/data"
 import { cn } from "@/lib/utils"
+import type { Category, Product } from "@/lib/types"
 
-export function ProductsClient() {
+
+export function ProductsClient({
+  products,
+  categories,
+}: {
+  products: Product[]
+  categories: Category[]
+}) {
   const searchParams = useSearchParams()
-  const initialCategory = searchParams.get("category") ?? "all"
-  const [activeCategory, setActiveCategory] = useState(initialCategory)
+  const categorySlug = searchParams.get("category")
+
+  const initialCategoryId =
+    categories.find((category) => category.slug === categorySlug)?.id ?? "all"
+
+  const [activeCategory, setActiveCategory] = useState(initialCategoryId)
   const [query, setQuery] = useState("")
   const [sort, setSort] = useState<"featured" | "price-asc" | "price-desc" | "rating">(
     "featured",
@@ -20,8 +31,11 @@ export function ProductsClient() {
   const filtered = useMemo(() => {
     let list = [...products]
     if (activeCategory !== "all") {
-      list = list.filter((p) => p.category === activeCategory)
+      list = list.filter(
+        (p) => p.categoryId === activeCategory
+      )
     }
+
     if (query.trim()) {
       const q = query.trim().toLowerCase()
       list = list.filter(
@@ -46,18 +60,18 @@ export function ProductsClient() {
         list.sort((a, b) => Number(!!b.featured) - Number(!!a.featured))
     }
     return list
-  }, [activeCategory, query, sort])
+  }, [activeCategory, query, sort, products, categories])
 
   return (
     <div className="container-max w-full px-4 py-8 sm:px-6 lg:px-8">
       <header className="flex flex-col gap-4 border-b border-border pb-8 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="text-sm font-medium text-primary">Products</p>
+          <p className="text-sm font-medium text-primary">Produk</p>
           <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-            All frozen goodness in one place
+            semua produk
           </h1>
           <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-            Filter by category, search by name, or sort by what matters most to you.
+            Temukan nugget, dimsum, sosis, dan camilan beku premium lainnya yang siap dikirim segar ke rumah Anda.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -66,7 +80,7 @@ export function ProductsClient() {
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search nuggets, dimsum, sosis…"
+              placeholder="Cari produk..."
               className="pl-9"
               aria-label="Search products"
             />
@@ -76,13 +90,13 @@ export function ProductsClient() {
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value as typeof sort)}
-              className="h-9 rounded-md border border-input bg-background pl-9 pr-3 text-sm shadow-xs focus-visible:outline-2 focus-visible:outline-ring"
+              className="pl-9 rounded-md border border-input bg-background  text-sm shadow-xs focus-visible:outline-2 focus-visible:outline-ring"
               aria-label="Sort products"
             >
-              <option value="featured">Featured</option>
-              <option value="price-asc">Price: low to high</option>
-              <option value="price-desc">Price: high to low</option>
-              <option value="rating">Top rated</option>
+              <option value="featured">Unggulan</option>
+              <option value="price-asc">Harga: rendah ke tinggi</option>
+              <option value="price-desc">Harga: tinggi ke rendah</option>
+              <option value="rating">Peringkat tertinggi</option>
             </select>
           </div>
         </div>
@@ -90,7 +104,7 @@ export function ProductsClient() {
 
       <div className="mt-6 -mx-4 flex gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0">
         <CategoryChip
-          label="All"
+          label="Semua"
           active={activeCategory === "all"}
           onClick={() => setActiveCategory("all")}
           count={products.length}
@@ -99,9 +113,9 @@ export function ProductsClient() {
           <CategoryChip
             key={c.id}
             label={c.name}
-            active={activeCategory === c.slug}
-            onClick={() => setActiveCategory(c.slug)}
-            count={products.filter((p) => p.category === c.slug).length}
+            active={activeCategory === c.id}
+            onClick={() => setActiveCategory(c.id)}
+            count={products.filter((p) => p.categoryId === c.id).length}
           />
         ))}
       </div>

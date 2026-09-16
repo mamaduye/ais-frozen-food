@@ -16,9 +16,9 @@ export function CartClient() {
   return (
     <div className="container-max w-full px-4 py-8 sm:px-6 lg:px-8">
       <header className="border-b border-border pb-8">
-        <p className="text-sm font-medium text-primary">Your cart</p>
+        <p className="text-sm font-medium text-primary">keranjang</p>
         <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-          {itemCount > 0 ? `${itemCount} item${itemCount > 1 ? "s" : ""} ready for checkout` : "Your cart is empty"}
+          {itemCount > 0 ? `${itemCount} item${itemCount > 1 ? "s" : ""} siap untuk checkout` : "Keranjang Anda kosong"}
         </h1>
       </header>
 
@@ -28,15 +28,15 @@ export function CartClient() {
             <EmptyMedia variant="icon">
               <ShoppingBag />
             </EmptyMedia>
-            <EmptyTitle>Nothing here yet</EmptyTitle>
+            <EmptyTitle>Keranjang Anda kosong</EmptyTitle>
             <EmptyDescription>
-              Browse our frozen menu and add your favorites to get started.
+              Telusuri menu beku kami dan tambahkan favorit Anda untuk memulai.
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
             <Button asChild>
               <Link href="/products">
-                Browse products
+                Cari produk
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
@@ -102,7 +102,7 @@ export function CartClient() {
           </ul>
 
           <aside className="card-base h-fit rounded-lg p-6 sticky top-20">
-            <h2 className="font-display text-lg font-semibold text-foreground">Order summary</h2>
+            <h2 className="font-display text-lg font-semibold text-foreground">Ringkasan Pesanan</h2>
             <dl className="mt-4 space-y-2 text-sm">
               <Row label="Subtotal" value={formatRupiah(subtotal)} />
               <Row
@@ -119,12 +119,12 @@ export function CartClient() {
             </div>
             <Button asChild size="lg" className="mt-6 w-full">
               <Link href="/checkout">
-                Proceed to checkout
+                Checkout
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
             <p className="mt-3 text-center text-xs text-muted-foreground">
-              Cold-chain packaging included on all orders.
+              Pengemasan rantai dingin termasuk dalam semua pesanan.
             </p>
           </aside>
         </div>
